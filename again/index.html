@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>省市县三级联动</title>
+</head>
+
+<body>
+    <!-- 省级 -->
+    <select name="" id="province">
+        <option value="">请选择省份</option>
+    </select>
+    <!-- 市级 -->
+    <select name="" id="city">
+        <option value="">请选择市</option>
+    </select>
+    <!-- 县级 -->
+    <select name="" id="area">
+        <option value="">请选择县/区</option>
+    </select>
+    <script src="./jquery-1.12.4.min.js"></script>
+    <script>
+        $.ajax({
+            url: './data.php',
+            type: 'get',
+            data: {
+                table: 'province'
+            },
+            // 若 php 中 未设置 Content-Type 
+            // dataType: 'json',
+            // contentType: 'application/json',
+            success: function (info) {
+                console.log(info);
+                var html = '<option value="">请选择省份</option>';
+                for (var i = 0; i < info.length; i++) {
+                    html += '<option value="' + info[i].code + '">' + info[i].name + '</option>';
+                }
+                $('#province').html(html);
+            }
+        });
+        $('#province').on('change', function () {
+            console.log($(this).val());
+            $.ajax({
+                url: './data.php',
+                type: 'get',
+                dataType: 'json',
+                // contentType: 'application/json',
+                data: {
+                    table: 'city',
+                    code: $(this).val()
+                },
+                success: function (info) {
+                    console.log(info);
+
+                    var html = '<option value="">请选择市</option>';
+                    for (var i = 0; i < info.length; i++) {
+                        html += '<option value="' + info[i].code + '">' + info[i].name +
+                            '</option>';
+                    }
+                    $('#city').html(html);
+                }
+            });
+        });
+        $('#city').on('change', function () {
+            $.ajax({
+                url: './data.php',
+                type: 'get',
+                data: {
+                    table: 'area',
+                    code: $(this).val()
+                },
+                dataType: 'json',
+                success: function (info) {
+                    console.log(info);
+
+                    var html = '<option value="">请选择县/区</option>';
+                    for (var i = 0; i < info.length; i++) {
+                        html += '<option value="' + info[i].code + '">' + info[i].name +
+                            '</option>';
+                    }
+                    $('#area').html(html);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>省市县三级联动</title>
+</head>
+<body>
+	<!-- 省级 -->
+	<select name="" id="province">
+		<option value="">请选择省份</option>
+	</select>
+	<!-- 市级 -->
+	<select name="" id="city">
+		<option value="">请选择市</option>
+	</select>
+	<!-- 区县级 -->
+	<select name="" id="area">
+		<option value="">请选择区/县</option>
+	</select>
+	<script src="jquery-1.12.4.min.js"></script>
+	<script>
+		// 省市县的数据都应该来自于服务端
+		// 前端发送请求来获取
+		// 将获取的结果添加到 DOM
+		
+		// 先取省一级
+		$.ajax({
+			url: './data.php',
+			type: 'get',
+			data: {table: 'province'},
+			success: function (info) {
+				// info 为响应结果
+				// console.log(info);
+				
+				var html = '<option value="">请选择省份</option>';
+				for(var i=0; i<info.length; i++) {
+					html += '<option value="' + info[i].code + '">' + info[i].name + '</option>'
+				}
+
+				// 添加 省份
+				$('#province').html(html);
+			}
+		});
+
+		// 当省份发生 change 事件时，再去查找所辖的市
+		$('#province').on('change', function () {
+
+			// 省份的 code
+			// console.log($(this).val());
+
+			// 发送请求，获取所辖的市
+			$.ajax({
+				url: './data.php',
+				type: 'get',
+				data: {table: 'city', code: $(this).val()},
+				success: function (info) {
+					console.log(info);
+
+					var html = '<option value="">请选择市</option>';
+					for(var i=0; i<info.length; i++) {
+						html += '<option value="' + info[i].code + '">' + info[i].name + '</option>'
+					}
+
+					$('#city').html(html);
+				}
+			});
+
+			// 当市级元素 change 事件发生时，发送一个请求
+			// 将获得到的数据添加 DOM 中
+			
+			$('#city').on('change', function () {
+
+				$.ajax({
+					url: 'data.php',
+					type:'get',
+					data: {table: 'area', code: $(this).val()},
+					success: function (info) {
+						// info 响应的结果
+						// console.log(info);
+
+						var html = '<option value="">请选择区/县</option>';
+						for(var i=0; i<info.length; i++) {
+							html += '<option value="' + info[i].code + '">' + info[i].name + '</option>'
+						}
+
+						$('#area').html(html);
+					}
+				});
+
+			})
+		})
+	</script>
+</body>
+</html>
